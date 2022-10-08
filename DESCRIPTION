@@ -1,0 +1,23 @@
+Type: Package
+Package: glab.library2
+Title: Graeber Lab Data Analysis Functions
+Version: 0.1.1
+Authors@R: 
+    person("Yi Jou (Ruby)", "Liao", , "liaoyjruby@ucla.edu", role = c("aut", "cre"))
+Description: Library of useful functions and R scripts for data mining.
+    Collected from Graeber Lab analyses through the years.
+License: MIT + file LICENSE
+biocViews:
+Imports: 
+    ggplot2,
+    utils
+Suggests: 
+    data.table,
+    knitr,
+    rmarkdown,
+    rprojroot
+VignetteBuilder: 
+    knitr
+Encoding: UTF-8
+Roxygen: list(markdown = TRUE)
+RoxygenNote: 7.2.1
