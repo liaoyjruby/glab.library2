@@ -17,6 +17,7 @@ Imports:
     utils,
     vegan
 Suggests: 
+    covr,
     data.table,
     knitr,
     rmarkdown,
