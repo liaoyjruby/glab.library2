@@ -10,14 +10,18 @@ License: MIT + file LICENSE
 biocViews:
 Imports: 
     ggplot2,
-    utils
+    ggpubr,
+    ggrepel,
+    mixOmics,
+    rgl,
+    utils,
+    vegan
 Suggests: 
     data.table,
     knitr,
     rmarkdown,
     rprojroot
-VignetteBuilder: 
-    knitr
+VignetteBuilder: knitr
 Encoding: UTF-8
 Roxygen: list(markdown = TRUE)
 RoxygenNote: 7.2.1

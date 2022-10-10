@@ -1,51 +1,53 @@
 ---
-title: "PCA_tutorial"
+title: "PCA / PLSR Tutorial"
+author: "Katherine Sheu, Yi Jou (Ruby) Liao"
 output: rmarkdown::html_vignette
+fig_width: 7
+fig_height: 5
 vignette: >
   %\VignetteIndexEntry{PCA_tutorial}
-  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEngine{knitr::knitr}
   %\VignetteEncoding{UTF-8}
+bibliography: references.bib
+link-citations: true
 ---
 
-```{r, include = FALSE}
-knitr::opts_chunk$set(root.dir = rprojroot::find_rstudio_root_file(), collapse = TRUE, comment = "#>") # Set working directory of Rmd to package root directory
-```
-
-```{r setup}
+```{r setup, include = FALSE}
+knitr::opts_chunk$set(root.dir = dirname(dirname(rstudioapi::getSourceEditorContext()$path)), collapse = TRUE, comment = "#>") # Set working directory of Rmd to package root directory
+options(rmarkdown.html_vignette.check_title = FALSE)
 library(glab.library2)
 ```
 
-# PCA / PLSR Tutorial
-
-Originally written by Katherine Sheu.
-Recommend running this tutorial using RStudio.
+Originally written by Katherine Sheu. Recommend running this tutorial using RStudio.
 
 ## Introduction
 
 Here are some examples for running PCA and PLSR using functions from this package. The tutorial is written in R Markdown format -- similar to Jupyter Notebooks for Python where code chunks are interspersed between descriptive text and can be run.
-  
+
 ## PCA Run & Plot
 
+Input data:
+
+-   glab.library2/inst/extdata/
+    -   Beltran_2016_rsem_genes_upper_norm_counts_coding_log2.txt
+    -   human.info.rsem.expression.txt
+
 Scripts:
-glab.library2/R/
-  PCA_from_file.R
-	plot_PCA.R
+
+-   glab.library2/R/
+    -   PCA_from_file.R
+    -   plot_PCA.R
 
 The PCA scripts are basically a wrapper for the R package 'prcomp'.
-	https://stat.ethz.ch/R-manual/R-devel/library/stats/html/prcomp.html
 
-Input data:
-glab.library2/inst/extdata/
-  Beltran_2016_rsem_genes_upper_norm_counts_coding_log2.txt
-	human.info.rsem.expression.txt
+-   <https://stat.ethz.ch/R-manual/R-devel/library/stats/html/prcomp.html>
 
-As the file name for the data implies, the input data comes from a 2016 paper from Beltran et al. Citation:
-Beltran H, Prandi D, Mosquera JM, Benelli M, Puca L, Cyrta J, Marotz C, Giannopoulou E, Chakravarthi BV, Varambally S, Tomlins SA, Nanus DM, Tagawa ST, Van Allen EM, Elemento O, Sboner A, Garraway LA, Rubin MA, Demichelis F. Divergent clonal evolution of castration-resistant neuroendocrine prostate cancer. Nat Med. 2016 Mar;22(3):298-305. doi: 10.1038/nm.4045. Epub 2016 Feb 8. PMID: 26855148; PMCID: PMC4777652.
+As the file name for the data implies, the input data comes from a 2016 paper from @beltran2016 .
 
 Source the PCA R files to load the functions into memory.
 
 ```{r Source PCA functions}
-source("../R/PCA_from_file.R")
+source('../R/PCA_from_file.R')
 source("../R/plot_PCA.R")
 ```
 
@@ -57,17 +59,24 @@ Functions that are installed as part of an R package such as this one (glab.libr
 ```
 
 Run PCA using the function in this package. The function will output 3 text files associated with the PCA run to the folder that the gene expression counts are located (../inst/extdata/):
-- Beltran_2016_rsem_genes_upper_norm_counts_coding_log2_prcomp_loadings.txt
-- Beltran_2016_rsem_genes_upper_norm_counts_coding_log2_prcomp_scores.txt
-- Beltran_2016_rsem_genes_upper_norm_counts_coding_log2_prcomp_sdev.txt
+
+-   Beltran_2016_rsem_genes_upper_norm_counts_coding_log2_prcomp_loadings.txt
+-   Beltran_2016_rsem_genes_upper_norm_counts_coding_log2_prcomp_scores.txt
+-   Beltran_2016_rsem_genes_upper_norm_counts_coding_log2_prcomp_sdev.txt
+
 ```{r Run PCA from file}
 PCA_from_file("../inst/extdata/Beltran_2016_rsem_genes_upper_norm_counts_coding_log2.txt", center = T, scale = F)
 ```
 
 Load in the annotation file for the samples. This file contains a table matching each sample with its type. The annotations are then used to color the points in the PCA plot of scores (the samples) by their type (LUAD, ESCA, etc.)
-```{r Annotate plot by type, fig.width=7, fig.height=5}
-human.info <- read.delim("../inst/extdata/human.info.rsem.expression.txt")
 
+```{r Load annotation file}
+human.info <- read.delim("../inst/extdata/human.info.rsem.expression.txt")
+head(human.info)
+```
+
+```{r Plot PCA with annotation info, fig.width=7, fig.height=5}
+require(ggplot2)
 plot_PCA(file = "../inst/extdata/Beltran_2016_rsem_genes_upper_norm_counts_coding_log2_prcomp_scores.txt",
          info.name = human.info$sample,
          info.type = human.info$type,
@@ -76,22 +85,72 @@ plot_PCA(file = "../inst/extdata/Beltran_2016_rsem_genes_upper_norm_counts_codin
          PCx = "PC1", PCy = "PC2")
 ```
 
-
-
 ## PLSR Run & Plot
 
 Scripts:
-glab.library2/R/
-	varimax_from_file.R
-	PLSR_from_file.R
-	plot_pls.R
+
+-   glab.library2/R/
+    -   varimax_from_file.R
+    -   PLSR_from_file.R
+    -   plot_pls.R
 
 Input files:
-glab.library2/inst/extdata/
-	Beltran_2016_rsem_genes_upper_norm_counts_coding_log2.txt
-	human.info.rsem.expression.txt
+
+-   glab.library2/inst/extdata/
+    -   Beltran_2016_rsem_genes_upper_norm_counts_coding_log2.txt
+    -   human.info.rsem.expression.txt
+
+PLSR scripts are a wrapper for R package 'pls'mixOmics':
+
+- <https://cran.r-project.org/web/packages/mixOmics/index.html>
+- <http://www.bioconductor.org/packages/release/bioc/html/mixOmics.html>
 
 
-PLSR scripts are a wrapper for R package 'pls'mixOmics'.
-  https://cran.r-project.org/web/packages/mixOmics/index.html
-  http://www.bioconductor.org/packages/release/bioc/html/mixOmics.html
+PLSR is a supervised algorithm, so the labels for samples (human.info) must be provided to indicate which samples are the response values. The if statement in function call assigns a "1" for samples with type == "NEPC" while all other types are assigned "0".
+```{r Run PLSR from file}
+# source('../R/PLSR_from_file.R')
+human.info <- read.delim("../inst/extdata/human.info.rsem.expression.txt")
+
+glab.library2::PLSR_from_file(
+  file = "../inst/extdata/Beltran_2016_rsem_genes_upper_norm_counts_coding_log2.txt",
+  sample.names = human.info$sample,
+  sample.type = human.info$type,
+  y.response = (ifelse(human.info$type=="NEPC", 1, 0)),
+  comps = 5, scale = F)
+```
+
+
+```{r Plot PLSR, fig.width=7, fig.height=5}
+source('../R/plot_PLS.R')
+human.info <- read.delim("../inst/extdata/human.info.rsem.expression.txt")
+
+plot_PLS(
+  file ="../inst/extdata/Beltran_2016_rsem_genes_upper_norm_counts_coding_log2_PLSR_Xscores.txt",
+  info.name = human.info$sample,
+  info.type = human.info$type,
+  title = "PLSR",
+  labels = T,
+  PCx = "comp1", PCy = "comp2", ellipse = T, conf = 0.90)
+```
+
+## Varimax
+
+Varimax is a rotational transformation method that can be applied to either PCA or PLSR results to help increase interpretation of weights.
+
+```{r Run varimax from file}
+varimax_from_file(
+  file.scores = "../inst/extdata/Beltran_2016_rsem_genes_upper_norm_counts_coding_log2_prcomp_scores.txt",
+  file.loadings = "../inst/extdata/Beltran_2016_rsem_genes_upper_norm_counts_coding_log2_prcomp_loadings.txt",
+  comp = 2, normalize = F
+)
+
+# Plotting setup is the same as the previous PCA run
+plot_PCA(
+  file = "../inst/extdata/Beltran_2016_rsem_genes_upper_norm_counts_coding_log2_prcomp_scores_VARIMAX.txt",
+  info.name = human.info$sample,
+  info.type = human.info$type,
+  labels = F, ellipse = T
+)
+```
+
+
