@@ -6,15 +6,17 @@ fig_width: 7
 fig_height: 5
 vignette: >
   %\VignetteIndexEntry{PCA_tutorial}
-  %\VignetteEngine{knitr::knitr}
+  %\VignetteEngine{rmarkdown::render}
   %\VignetteEncoding{UTF-8}
 bibliography: references.bib
 link-citations: true
 ---
 
 ```{r setup, include = FALSE}
+library(rstudioapi)
 knitr::opts_chunk$set(root.dir = dirname(dirname(rstudioapi::getSourceEditorContext()$path)), collapse = TRUE, comment = "#>") # Set working directory of Rmd to package root directory
 options(rmarkdown.html_vignette.check_title = FALSE)
+
 library(glab.library2)
 ```
 
@@ -153,4 +155,26 @@ plot_PCA(
 )
 ```
 
+## PCA 3D Visualization
 
+Sometimes, the first two principal components from PCA results may fully capture the relationship in data - in which case looking into later components with an interactive 3-dimensional plot may be useful.
+
+```{r Preparing data}
+scores <- read.delim("../inst/extdata/Beltran_2016_rsem_genes_upper_norm_counts_coding_log2_prcomp_scores.txt")
+info <- read.delim("../inst/extdata/human.info.rsem.expression.txt")
+colnames(info) <- c("cellline", "Group")
+# Subset info to samples in score
+info <- info[info$cellline %in% scores$Score, ]
+```
+
+```{r Plot 3d}
+glab.library2::plot_PCA_3d(scores = scores, 
+            info = info, info.Group = info$Group, 
+            grouplabels = TRUE, Title = "PCA 3D Plot - Beltran 2016")
+
+glab.library2::plot_PCA_3d(scores = scores, 
+            info = info, indiv_labels = TRUE, 
+            Title = "PCA 3D Plot - Beltran 2016 (Labeled)")
+```
+
+## References

@@ -37,6 +37,7 @@
 #' plot_PCA_3d(scores=scores,info=info,indiv_labels=TRUE,Title ="3D Plot-Iris Species")
 #'
 plot_PCA_3d <- function(scores, info, info.Group = NA, PCx = "PC1", PCy = "PC2", PCz = "PC3", indiv_labels = FALSE, grouplabels = FALSE, Title = "3D PCA Plot", drawshape = FALSE) {
+
   scores <- scores[order(match(scores$Score, info$cellline, )), ]
   if (nrow(scores) == nrow(info)) {
     paste("number of rows in Scores matches number of rows in Info")
