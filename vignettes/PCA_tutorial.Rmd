@@ -28,10 +28,12 @@ Here are some examples for running PCA and PLSR using functions from this packag
 
 ## PCA Run & Plot
 
+First, we'll run PCA and plot results. Principal Components Analysis is an unsupervised dimensionality reduction algorithm used often in analysis of gene expression data because usually datasets consist of a high number of genes (predictors) and low number of samples (observations). PCA transform the data in a way that maximizes variance and results in uncorrelated components that makes it easier to see trends between gene expression and samples when plotted and colored by conditions of interest (batch, sample type, cancer subtype, etc.)
+
 Input data:
 
 -   glab.library2/inst/extdata/
-    -   Beltran_2016_rsem_genes_upper_norm_counts_coding_log2.txt
+    -   Beltran_2016_rsem_genes_upper_norm_counts_coding_log2.txt: gene expression data
     -   human.info.rsem.expression.txt
 
 Scripts:
@@ -46,18 +48,26 @@ The PCA scripts are basically a wrapper for the R package 'prcomp'.
 
 As the file name for the data implies, the input data comes from a 2016 paper from @beltran2016 .
 
-Source the PCA R files to load the functions into memory.
+Functions that are installed as part of an R package such as this one (glab.library2) can  be called in code directly from the package as shown below. Use '?' before any function to view R Documentation on the Help pane.
+
+```{r Call function from package}
+?glab.library2::PCA_from_file()
+?glab.library2::plot_PCA()
+```
+
+If you're writing a function for yourself and not trying to run one from a package, you can source the PCA R files to load the functions into memory.
 
 ```{r Source PCA functions}
 source('../R/PCA_from_file.R')
 source("../R/plot_PCA.R")
 ```
 
-Functions that are installed as part of an R package such as this one (glab.library2) can also be called in code directly from the package as shown below. Use '?' before any function to view R Documentation on the Help pane.
-
-```{r Call function from package}
-?glab.library2::PCA_from_file()
-?glab.library2::plot_PCA()
+The gene expression data is a data frame with columns representing different prostate cancer samples and rows representing different genes as shown in the first 10 rows of the dataframe. The values indicate levels of gene expression of a gene for a given sample.
+```{r Load & view gene expression data}
+gene.expression <- read.delim(
+  file = "../inst/extdata/Beltran_2016_rsem_genes_upper_norm_counts_coding_log2.txt",
+  header = T)
+head(gene.expression, n=10)
 ```
 
 Run PCA using the function in this package. The function will output 3 text files associated with the PCA run to the folder that the gene expression counts are located (../inst/extdata/):
@@ -67,7 +77,9 @@ Run PCA using the function in this package. The function will output 3 text file
 -   Beltran_2016_rsem_genes_upper_norm_counts_coding_log2_prcomp_sdev.txt
 
 ```{r Run PCA from file}
-PCA_from_file("../inst/extdata/Beltran_2016_rsem_genes_upper_norm_counts_coding_log2.txt", center = T, scale = F)
+glab.library2::PCA_from_file(
+  file = "../inst/extdata/Beltran_2016_rsem_genes_upper_norm_counts_coding_log2.txt",
+  center = T, scale = F)
 ```
 
 Load in the annotation file for the samples. This file contains a table matching each sample with its type. The annotations are then used to color the points in the PCA plot of scores (the samples) by their type (LUAD, ESCA, etc.)
@@ -104,13 +116,12 @@ Input files:
 
 PLSR scripts are a wrapper for R package 'pls'mixOmics':
 
-- <https://cran.r-project.org/web/packages/mixOmics/index.html>
-- <http://www.bioconductor.org/packages/release/bioc/html/mixOmics.html>
-
+-   <https://cran.r-project.org/web/packages/mixOmics/index.html>
+-   <http://www.bioconductor.org/packages/release/bioc/html/mixOmics.html>
 
 PLSR is a supervised algorithm, so the labels for samples (human.info) must be provided to indicate which samples are the response values. The if statement in function call assigns a "1" for samples with type == "NEPC" while all other types are assigned "0".
+
 ```{r Run PLSR from file}
-# source('../R/PLSR_from_file.R')
 human.info <- read.delim("../inst/extdata/human.info.rsem.expression.txt")
 
 glab.library2::PLSR_from_file(
@@ -121,12 +132,11 @@ glab.library2::PLSR_from_file(
   comps = 5, scale = F)
 ```
 
-
 ```{r Plot PLSR, fig.width=7, fig.height=5}
 source('../R/plot_PLS.R')
 human.info <- read.delim("../inst/extdata/human.info.rsem.expression.txt")
 
-plot_PLS(
+glab.library2::plot_PLS(
   file ="../inst/extdata/Beltran_2016_rsem_genes_upper_norm_counts_coding_log2_PLSR_Xscores.txt",
   info.name = human.info$sample,
   info.type = human.info$type,
@@ -140,14 +150,14 @@ plot_PLS(
 Varimax is a rotational transformation method that can be applied to either PCA or PLSR results to help increase interpretation of weights.
 
 ```{r Run varimax from file}
-varimax_from_file(
+glab.library2::varimax_from_file(
   file.scores = "../inst/extdata/Beltran_2016_rsem_genes_upper_norm_counts_coding_log2_prcomp_scores.txt",
   file.loadings = "../inst/extdata/Beltran_2016_rsem_genes_upper_norm_counts_coding_log2_prcomp_loadings.txt",
   comp = 2, normalize = F
 )
 
 # Plotting setup is the same as the previous PCA run
-plot_PCA(
+glab.library2::plot_PCA(
   file = "../inst/extdata/Beltran_2016_rsem_genes_upper_norm_counts_coding_log2_prcomp_scores_VARIMAX.txt",
   info.name = human.info$sample,
   info.type = human.info$type,
